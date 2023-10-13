@@ -14,7 +14,7 @@ ikkuna.title("Exercise 8")
 ikkuna.geometry("700x700")
 
 
-monkey_img = Image.open("apina.png")
+monkey_img = Image.open("apina2.png")
 monkey_img= monkey_img.resize((20,20))
 monkey_img = ImageTk.PhotoImage(monkey_img)
 
@@ -45,9 +45,10 @@ erikois_kanvas=FigureCanvasTkAgg(fig1,master=ikkuna)
 erikois_kanvas.get_tk_widget().place(x=-117,y=-110)
 
 erikois_kanvas.draw()
-
-
+global monkeylist
+monkeylist=[]
 def new_island():
+    global monkeylist
     n=0
     count=0
     island_x=random.randint(0,519)
@@ -67,7 +68,6 @@ def new_island():
                     count=0
                     island_x=ix
                 if island_y > iy:
-                    #island_x-=180
                     island_y-=140
                     area_empty=1
 
@@ -83,8 +83,6 @@ def new_island():
                 #print("arvotaan uusi sijainti")
 
         if area_empty == 1:
-            #saari=tk.Label(ikkuna,background="yellow",image=saari_img,borderwidth=0, highlightthickness=0)
-            #saari.place(x=island_x,y=island_y)
             island_matrix[island_x,island_y]=1
             island_x+=1
             count+=1
@@ -92,31 +90,67 @@ def new_island():
                 island_y+=1
                 count=0
                 island_x=ix
-                #print("countissa")
+                print("x= ",island_x,"y= ",island_y)
             
             if island_y >= iy:
                 ax1m.set_data(island_matrix)
                 fig1.canvas.draw()
                 fig1.canvas.flush_events()
+                island_x=island_y-20
+                island_y=ix
                 for i in range(10):
                     monkey = tk.Label(ikkuna,image=monkey_img)
-                    island_x=100
-                    island_y=100
+                    island_x-=20
+                    count+=1
+                    monkeylist.append(monkey)
+                    if count > 5:
+                        island_x+=100
+                        island_y+=40
+                        count=0
+                    
+                    print("apina x= ",island_x,"y= ",island_y)
                     monkey.place(x=island_x,y=island_y)
                 n=1
     
-
 
 def new_island_thread():
     t=threading.Thread(target=new_island)
     t.start()
 
+def monkey_checks():
+    global monkeylist
+    n=0
+    global soundlist
+    soundlist=[]
+    while n==0:
+        length = len(monkeylist)
+
+        for i in range(length):
+            if soundlist.__len__() <length:
+                    soundlist.append(random.randint(200,1000))
+            winsound.Beep(soundlist[i],50)
+        time.sleep(10)
+
+def monkey_checks_thread():
+    t=threading.Thread(target=monkey_checks)
+    t.start()        
+
 def delete_island():
+    global monkeylist
     global island_matrix
+    global soundlist
     for j in range(700):
      for i in range(700):
          island_matrix[j,i]=-10
     
+    length = len(monkeylist)
+  
+    for i in range(length):
+        monkeylist[i].destroy()
+        
+    monkeylist.clear()    
+    soundlist.clear()
+
     ax1m.set_data(island_matrix)
     fig1.canvas.draw()
 
@@ -130,8 +164,12 @@ add_island.place(x=50,y=50)
 delete_island_button = tk.Button(ikkuna, text ="DELETE ISLAND", command = delete_island_thread)
 delete_island_button.place(x=50,y=80)
 
+delete_monkey_button = tk.Button(ikkuna, text ="DELETE MONKEY", command = monkey_checks_thread)
+delete_monkey_button.place(x=120,y=80)
+
 #monkey = tk.Label(ikkuna,image=monkey_img)
 #monkey.place(x=200,y=200)
+monkey_checks_thread()
 
 
 ikkuna.mainloop()
