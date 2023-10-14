@@ -18,15 +18,15 @@ monkey_img = Image.open("apina2.png")
 monkey_img= monkey_img.resize((20,20))
 monkey_img = ImageTk.PhotoImage(monkey_img)
 
-saari_img = Image.open("saari.png")
-saari_img= saari_img.resize((180,180))
-saari_img = ImageTk.PhotoImage(saari_img)
+#saari_img = Image.open("saari.png")
+#saari_img= saari_img.resize((180,180))
+#saari_img = ImageTk.PhotoImage(saari_img)
 
 img2 = tk.PhotoImage()
 meri=tk.Label(ikkuna,background="blue",image=img2,width=700,height=700)
 meri.place(x=0,y=0)
 
-saari=tk.Label(ikkuna,background="yellow",image=saari_img,borderwidth=0, highlightthickness=0)
+#saari=tk.Label(ikkuna,background="yellow",image=saari_img,borderwidth=0, highlightthickness=0)
 
 
 global island_matrix
@@ -47,6 +47,11 @@ erikois_kanvas.get_tk_widget().place(x=-117,y=-110)
 erikois_kanvas.draw()
 global monkeylist
 monkeylist=[]
+class Monkey_object:
+  def __init__(self,monkey,island):
+    self.monkey=monkey
+    self.island = island
+
 def new_island():
     global monkeylist
     n=0
@@ -99,17 +104,17 @@ def new_island():
                 island_x=island_y-20
                 island_y=ix
                 for i in range(10):
-                    monkey = tk.Label(ikkuna,image=monkey_img)
+                    m = Monkey_object(monkey = tk.Label(ikkuna,image=monkey_img),island=1)
                     island_x-=20
                     count+=1
-                    monkeylist.append(monkey)
+                    monkeylist.append(m)
                     if count > 5:
                         island_x+=100
                         island_y+=40
                         count=0
                     
                     print("apina x= ",island_x,"y= ",island_y)
-                    monkey.place(x=island_x,y=island_y)
+                    m.monkey.place(x=island_x,y=island_y)
                 n=1
     
 
@@ -129,11 +134,50 @@ def monkey_checks():
             if soundlist.__len__() <length:
                     soundlist.append(random.randint(200,1000))
             winsound.Beep(soundlist[i],50)
+
+        for i in range(length):
+            luckynumber=random.randint(0,10)
+            if luckynumber==1:
+                
+                if monkeylist[i].island==1:
+                    winsound.PlaySound("nauru.wav",winsound.SND_ASYNC)
+                if monkeylist[i].island==0:
+                    winsound.PlaySound("eat.wav",winsound.SND_ASYNC)
+                monkeylist[i].monkey.destroy()
+                monkeylist.pop(i)
+                soundlist.pop(i)
         time.sleep(10)
 
 def monkey_checks_thread():
     t=threading.Thread(target=monkey_checks)
-    t.start()        
+    t.start()   
+
+def monkey_swim():
+    max=monkeylist.__len__()-1
+    i=random.randint(0,max)
+    monkeylist[i].island=0
+    x=monkeylist[i].monkey.place_info().get("x")
+    y=monkeylist[i].monkey.place_info().get("y")
+    count=0
+    x=int(x)
+    y=int(y) 
+    for j in range(18):
+        count+=1
+        if count < 10:
+            x+=10
+        if count >= 10:
+            x-=10
+        time.sleep(0.5)
+        try:
+            monkeylist[i].monkey.place(x=x,y=y)
+        except:
+            print("apina menehtyi merellä")
+            break
+            
+    monkeylist[i].island=1
+def monkey_swim_thread():
+    t=threading.Thread(target=monkey_swim)
+    t.start()       
 
 def delete_island():
     global monkeylist
@@ -146,7 +190,7 @@ def delete_island():
     length = len(monkeylist)
   
     for i in range(length):
-        monkeylist[i].destroy()
+        monkeylist[i].monkey.destroy()
         
     monkeylist.clear()    
     soundlist.clear()
@@ -166,6 +210,9 @@ delete_island_button.place(x=50,y=80)
 
 delete_monkey_button = tk.Button(ikkuna, text ="DELETE MONKEY", command = monkey_checks_thread)
 delete_monkey_button.place(x=120,y=80)
+
+delete_monkey_button = tk.Button(ikkuna, text ="SWIM", command = monkey_swim_thread)
+delete_monkey_button.place(x=120,y=50)
 
 #monkey = tk.Label(ikkuna,image=monkey_img)
 #monkey.place(x=200,y=200)
