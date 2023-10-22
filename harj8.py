@@ -428,37 +428,44 @@ def monkey_swim(island_number):
                 
         #itä
         if direction ==3:
-            x=islandlist[i].x +18
+            x=islandlist[i].x + 20
             y=islandlist[i].y + 50
             m = Monkey_object(monkey = tk.Label(ikkuna,image=monkey_img),island=0)
             m.monkey.place(x=x,y=y)
             monkeylist.append(m)
             while n==0:
-                x+=1
-                m.monkey.place(x=x,y=y)
-                winsound.Beep(200,30)
                 
-                if island_matrix[y,x]==1:
-                    print("saari löytyi")
+                try:
+                    time.sleep(0.1)
+                    x+=1
+                    m.monkey.place(x=x,y=y)
+                    winsound.Beep(200,30)
+                    
+                    if island_matrix[y,x]==1:
+                        print("saari löytyi")
 
-                    length=islandlist.__len__()
-                    for i in range(length):
-                        length2=islandlist[i].island_location_list.__len__()
-                        for j in range(length2):
-                            if islandlist[i].island_location_list[j] == (y,x):
-                                print(islandlist[i].name["text"])
-                                value1 = islandlist[i].occupant_amount["textvariable"]
-                                value2=islandlist[i].occupant_amount.getvar(value1)
-                                value2= int(value2)
-                                value2+=1
-                                value2 =str(value2)
-                                ikkuna.setvar(name=value1, value=value2)
-                                islandlist[i].travelling=1
-                                m.monkey.destroy()
-                                m.island=1
-                    n=1
+                        length=islandlist.__len__()
+                        for i in range(length):
+                            length2=islandlist[i].island_location_list.__len__()
+                            for j in range(length2):
+                                if islandlist[i].island_location_list[j] == (y,x):
+                                    print(islandlist[i].name["text"])
+                                    value1 = islandlist[i].occupant_amount["textvariable"]
+                                    value2=islandlist[i].occupant_amount.getvar(value1)
+                                    value2= int(value2)
+                                    value2+=1
+                                    value2 =str(value2)
+                                    ikkuna.setvar(name=value1, value=value2)
+                                    islandlist[i].travelling=1
+                                    m.monkey.destroy()
+                                    m.island=1
+                        n=1
     
-                time.sleep(0.1)
+                except:
+                    print("apina ajelehi avomerelle")
+                    m.monkey.destroy()
+                    n=1
+
  
            
     
